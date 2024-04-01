@@ -33,3 +33,10 @@ async def create_user(body: UserSchema, db: AsyncSession = Depends(get_db)):
 async def update_token(user: User, token: str | None, db: AsyncSession):
     user.refresh_token = token
     await db.commit()
+
+
+async def confirmed_email(email: str, db: AsyncSession) -> None:
+    user = await get_user_by_email(email, db)
+    user.confirmed = True
+    await db.commit()
+
