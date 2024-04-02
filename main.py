@@ -6,7 +6,8 @@ from fastapi_limiter import FastAPILimiter
 import redis.asyncio as redis
 
 from src.database.db import get_db
-from src.routes import contacts, auth
+from src.database.config import config
+from src.routes import contacts, auth, users
 
 app = FastAPI()
 
@@ -21,12 +22,14 @@ app.add_middleware(
 )
 
 app.include_router(auth.router, prefix='/api')
+app.include_router(users.router, prefix='/api')
 app.include_router(contacts.router, prefix='/api')
 
 
 @app.on_event("startup")
 async def startup():
-    r = await redis.Redis(host='localhost', port=6379, db=0, encoding="utf-8",
+    r = await redis.Redis(host=config.REDIS_DOMAIN, port=config.REDIS_PORT, db=0,
+                          password=config.REDIS_PASSWORD, encoding="utf-8",
                           decode_responses=True)
     await FastAPILimiter.init(r)
 

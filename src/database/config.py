@@ -11,19 +11,23 @@ class Settings(BaseSettings):
     MAIL_FROM: str
     MAIL_PORT: int
     MAIL_SERVER: str
-    RADIS_DOMAIN: str = 'localhost'
-    RADIS_PORT: int = 6379
-    RADIS_PASSWORD: str
+    REDIS_DOMAIN: str = "localhost"
+    REDIS_PORT: int = 6379
+    REDIS_PASSWORD: str | None = None
+    CLOUDINARY_NAME: str
+    CLOUDINARY_API_KEY: int
+    CLOUDINARY_API_SECRET: str
 
-    @field_validator('ALGORITHM')
+    @field_validator("ALGORITHM")
     @classmethod
     def validate_algorithm(cls, v):
-        if v not in ['HS256', 'HS512']:
+        if v not in ["HS256", "HS512"]:
             raise ValueError("Algorithm must be HS256 or HS512")
         return v
 
-
-    model_config = ConfigDict(extra='ignore', env_file=".env", env_file_encoding='utf-8') # noqa
+    model_config = ConfigDict(
+        extra="ignore", env_file=".env", env_file_encoding="utf-8" # noqa
+    )
 
 
 config = Settings()

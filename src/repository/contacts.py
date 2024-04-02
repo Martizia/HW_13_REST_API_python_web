@@ -27,7 +27,9 @@ async def create_contact(body: ContactSchema, db: AsyncSession, current_user: Us
     return contact
 
 
-async def update_contact(contact_id: int, body: ContactUpdateSchema, db: AsyncSession, current_user: User):
+async def update_contact(
+    contact_id: int, body: ContactUpdateSchema, db: AsyncSession, current_user: User
+):
     stmt = select(Contact).filter_by(id=contact_id, user=current_user)
     result = await db.execute(stmt)
     contact = result.scalar_one_or_none()
@@ -54,7 +56,9 @@ async def delete_contact(contact_id: int, db: AsyncSession, current_user: User):
     return contact
 
 
-async def update_status_contact(contact_id: int, body: ContactStatusUpdate, db: AsyncSession, current_user: User):
+async def update_status_contact(
+    contact_id: int, body: ContactStatusUpdate, db: AsyncSession, current_user: User
+):
     stmt = select(Contact).filter_by(id=contact_id, user=current_user)
     result = await db.execute(stmt)
     contact = result.scalar_one_or_none()
@@ -66,11 +70,17 @@ async def update_status_contact(contact_id: int, body: ContactStatusUpdate, db: 
 
 
 async def search_contacts(search: str, db: AsyncSession, current_user: User):
-    stmt = select(Contact).filter_by(user=current_user).where(or_(
-        Contact.name.ilike(f'%{search}%'),
-        Contact.lastname.ilike(f'%{search}%'),
-        Contact.email.ilike(f'%{search}%')
-    ))
+    stmt = (
+        select(Contact)
+        .filter_by(user=current_user)
+        .where(
+            or_(
+                Contact.name.ilike(f"%{search}%"),
+                Contact.lastname.ilike(f"%{search}%"),
+                Contact.email.ilike(f"%{search}%"),
+            )
+        )
+    )
     result = await db.execute(stmt)
     return result.scalars().all()
 
@@ -79,35 +89,39 @@ async def get_birthday_contacts(days: int, db: AsyncSession, current_user: User)
     today = datetime.now().date()
     end_date = today + timedelta(days=days)
 
-    birthday_month = extract('month', Contact.birthday)
-    birthday_day = extract('day', Contact.birthday)
+    birthday_month = extract("month", Contact.birthday)
+    birthday_day = extract("day", Contact.birthday)
 
     current_year_birthday = func.to_date(
         func.concat(
-            func.to_char(today, 'YYYY'),
-            '-',
-            func.to_char(birthday_month, 'FM00'),
-            '-',
-            func.to_char(birthday_day, 'FM00')
+            func.to_char(today, "YYYY"),
+            "-",
+            func.to_char(birthday_month, "FM00"),
+            "-",
+            func.to_char(birthday_day, "FM00"),
         ),
-        'YYYY-MM-DD'
+        "YYYY-MM-DD",
     )
 
     next_year_birthday = func.to_date(
         func.concat(
-            func.to_char(today + timedelta(days=365), 'YYYY'),
-            '-',
-            func.to_char(birthday_month, 'FM00'),
-            '-',
-            func.to_char(birthday_day, 'FM00')
+            func.to_char(today + timedelta(days=365), "YYYY"),
+            "-",
+            func.to_char(birthday_month, "FM00"),
+            "-",
+            func.to_char(birthday_day, "FM00"),
         ),
-        'YYYY-MM-DD'
+        "YYYY-MM-DD",
     )
 
-    stmt = select(Contact).filter_by(user=current_user).where(
-        or_(
-            current_year_birthday.between(today, end_date),
-            next_year_birthday.between(today, end_date)
+    stmt = (
+        select(Contact)
+        .filter_by(user=current_user)
+        .where(
+            or_(
+                current_year_birthday.between(today, end_date),
+                next_year_birthday.between(today, end_date),
+            )
         )
     )
     result = await db.execute(stmt)
