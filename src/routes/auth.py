@@ -110,7 +110,11 @@ async def request_email(
     db: AsyncSession = Depends(get_db),
 ):
     user = await repository_users.get_user_by_email(body.email, db)
-
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User with email {body.email} is not registered",
+        )
     if user.confirmed:
         return {"message": "Your email is already confirmed"}
     if user:
