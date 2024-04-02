@@ -5,11 +5,11 @@ services:
     ports:
       - "6379:6379"
   postgres:
-    image: postgres:16
+    image: postgres:hw_13
     environment:
-      POSTGRES_DB: rest_api_hw
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${PG_DB}
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
