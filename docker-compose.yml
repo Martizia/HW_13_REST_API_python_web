@@ -1,0 +1,16 @@
+version: '3'
+services:
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: rest_api_hw
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
